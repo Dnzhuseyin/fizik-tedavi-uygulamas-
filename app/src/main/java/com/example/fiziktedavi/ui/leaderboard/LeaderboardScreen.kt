@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 
 data class User(val id: Int, val name: String, val score: Int)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaderboardScreen() {
     val users = remember {

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 
 data class Exercise(val id: Int, val name: String, val description: String, val isSelected: MutableState<Boolean>)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseListScreen() {
     val exercises = remember {
