@@ -1,5 +1,8 @@
 package com.example.fiziktedavi.ui.profile
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -8,7 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +49,8 @@ fun ProfileScreen() {
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                    .border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -81,12 +85,24 @@ fun ProfileScreen() {
 
 @Composable
 fun ProfileStat(label: String, value: String, modifier: Modifier = Modifier) {
+    var animatedValue by remember { mutableStateOf(0f) }
+    val targetValue = value.toFloatOrNull() ?: 0f // Assuming value can be converted to float for animation
+
+    LaunchedEffect(targetValue) {
+        animatedValue = targetValue
+    }
+
+    val animatedFloat by animateFloatAsState(
+        targetValue = animatedValue,
+        animationSpec = tween(durationMillis = 1000)
+    )
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
-        Text(text = value, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+        Text(text = if (label == "Haftalık Seri") value else animatedFloat.toInt().toString(), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
     }

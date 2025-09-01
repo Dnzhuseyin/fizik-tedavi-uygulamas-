@@ -1,13 +1,18 @@
 package com.example.fiziktedavi.ui.exerciselist
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -35,15 +40,34 @@ fun ExerciseListScreen() {
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { /* TODO: Add new exercise */ }) {
+                Icon(Icons.Default.Add, contentDescription = "Add new exercise")
+            }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+        if (exercises.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                items(exercises) { exercise ->
-                    ExerciseItem(exercise = exercise)
+                Icon(Icons.Default.FitnessCenter, contentDescription = "No exercises", modifier = Modifier.size(64.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Henüz egzersiz yok.", style = MaterialTheme.typography.headlineSmall)
+            }
+        } else {
+            Column(modifier = Modifier.padding(paddingValues)) {
+                LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(exercises) { exercise ->
+                        ExerciseItem(exercise = exercise)
+                    }
                 }
             }
         }
@@ -52,6 +76,8 @@ fun ExerciseListScreen() {
 
 @Composable
 fun ExerciseItem(exercise: Exercise) {
+    val scale by animateFloatAsState(if (exercise.isSelected.value) 1.1f else 1.0f)
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -63,6 +89,8 @@ fun ExerciseItem(exercise: Exercise) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Icon(Icons.Default.FitnessCenter, contentDescription = null, modifier = Modifier.size(32.dp))
+            Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = exercise.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
@@ -74,7 +102,8 @@ fun ExerciseItem(exercise: Exercise) {
                 onCheckedChange = { exercise.isSelected.value = it },
                 colors = CheckboxDefaults.colors(
                     checkedColor = MaterialTheme.colorScheme.primary
-                )
+                ),
+                modifier = Modifier.scale(scale)
             )
         }
     }

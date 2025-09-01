@@ -1,11 +1,17 @@
 package com.example.fiziktedavi.ui.leaderboard
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -43,13 +49,32 @@ fun LeaderboardScreen() {
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            itemsIndexed(users) { index, user ->
-                LeaderboardItem(rank = index + 1, user = user)
+        if (users.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(Icons.Default.EmojiEvents, contentDescription = "No users", modifier = Modifier.size(64.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Henüz sıralama yok.", style = MaterialTheme.typography.headlineSmall)
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                itemsIndexed(users) { index, user ->
+                    AnimatedVisibility(
+                        visible = true, // Always visible for now, but can be controlled for entry animation
+                        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 })
+                    ) {
+                        LeaderboardItem(rank = index + 1, user = user)
+                    }
+                }
             }
         }
     }
@@ -68,16 +93,32 @@ fun LeaderboardItem(rank: Int, user: User) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "#$rank",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "$rank",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
             Spacer(modifier = Modifier.width(16.dp))
-            // You can add user avatar here
-            // Image(painter = painterResource(id = R.drawable.avatar), contentDescription = null, modifier = Modifier.size(40.dp).clip(CircleShape))
-            // Spacer(modifier = Modifier.width(16.dp))
+            // User Avatar Placeholder
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Person, contentDescription = "User Avatar", modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.secondary)
+            }
+            Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = user.name,
                 style = MaterialTheme.typography.titleMedium,
